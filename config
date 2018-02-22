@@ -1,0 +1,281 @@
+# Please see http://i3wm.org/docs/userguide.html for a complete reference!
+# setting mod variable to windows key
+set $mod Mod4
+
+set $silently --no-startup-id
+set $update && killall -SIGUSR1 i3status
+set $wallps=~/Obrazy/wallpapers
+
+# set workspaces names
+Set $wrkspc1 "1:1"
+Set $wrkspc2 "2:2"
+set $wrkspc3 "3:3"
+set $wrkspc4 "4:4"
+set $wrkspc5 "5:5"
+set $wrkspc6 "6:6"
+set $wrkspc7 "7:7"
+set $wrkspc8 "8:8"
+set $wrkspc9 "9:9"
+set $wrkspc10 "10:10"
+
+#
+# # # # # # # # # # # #     WM    # # # # # # # # # # # #
+#
+# turn off mouse following
+focus_follows_mouse no
+show_marks yes
+
+# If a window is activated, e.g., via google-chrome www.google.com,
+# it may request to take focus. The window will always be marked urgent,
+# but the focus will not be stolen.
+focus_on_window_activation urgent
+force_display_urgency_hint 500 ms
+popup_during_fullscreen leave_fullscreen
+
+# # # # # --- Feeling/Look/Style
+#
+# Window border size
+new_window none
+new_float none
+# Hides vertical and horizontal borders when there's only one window.
+for_window [class="^.*"] border pixel 7
+smart_borders on
+hide_edge_borders both
+# Font
+font pango:Ubuntu Mono 10
+# window (client) colors
+# class                 border  backgr. text    indicator
+
+# Prepend title with program name
+for_window [class=".*"] title_format "%class - %title"
+#
+# # # # # --- Status bar
+#             See also i3blocks.conf - configure each status bar widget
+#bar {
+#  i3bar_command i3bar -t
+#  id main-top-bar
+#  font pango:Ubuntu Mono 10
+#  status_command i3blocks -c ~/.config/i3/i3blocks.conf
+#  tray_output primary
+#  tray_padding 1
+#  strip_workspace_numbers yes
+#  binding_mode_indicator yes
+
+#  # Disable mouse on workspaces buttons
+#  # bindsym button1 nop
+#  position top
+#  colors {
+#    separator #515151
+#    background #2d2d2d66
+#    statusline #cccccc
+
+#    focused_workspace #cccccc #cccccc #000000
+#    active_workspace #333333 #333333 #ffffff
+#    inactive_workspace #2d2d2d #2d2d2d #999999
+#    urgent_workspace #f2777a #f2777a #ffffff
+#  }
+#}
+
+# Run on startup
+exec_always $silently ~/.config/i3/polybar.sh &
+exec $silently nm-applet
+exec $silently pulseaudio --start
+exec $silently megasync
+exec $silently volumeicon
+exec $silently redshift
+# Restore GNOME's settings
+exec $silently /usr/libexec/gnome-settings-daemon-localeexec
+# Fix a bug in gnome-settings-daemon: http://feeding.cloud.geek.nz/posts/creating-a-modern-tiling-desktop-environment-using-i3/
+exec $silently dconf write /org/gnome/settings-daemon/plugins/cursor/active false
+# wallpaper or sth
+exec $silently feh --bg-scale ~/.anypaper/output.png
+exec $silently google-chrome
+exec $silently compton
+
+# System monitoring
+exec $silently i3-msg $wrkspc10 && exec alacritty --command glances
+
+# Specific window settings
+for_window [class="Nautilius|nautilius" instance="^desktop_window$"] floating disable
+for_window [window_role="pop-up"] floating enable
+for_window [window_role="prefwindow"] floating enable
+for_window [class="notify"] floating enable
+
+# Gaps
+gaps inner 10
+gaps outer 0
+
+# # # # # --- Launcher (rofi)
+#             see also rofi config
+# Main launcher & window switcher
+bindsym $mod+d exec "rofi -show-icons -combi-modi drun,run,window, -show combi -modi combi"
+bindsym $mod+Shift+d exec "rofi -show-icons -modi window -show window"
+
+# Prefer to use mod+alt(Mod1) for WM wide actions
+bindsym $mod+Mod1+r restart
+bindsym $mod+Mod1+e exit
+bindsym $mod+Mod1+w exec "i3lock -i ~/.config/i3/i3-lock-screen.png -t -f"
+bindsym $mod+Mod1+q exec ~/scripts/rofi/power.sh
+bindsym $mod+Mod1+s exec ~/scripts/rofi/i3_switch_workspace.sh
+
+# Volume/Playback
+# For PulseAudio 0 is sink to list sinks use
+# `pactl list sinks`
+bindsym $mod+Mod1+Down exec "pactl set-sink-volume 0 -5%"
+bindsym $mod+Mod1+Up exec "pactl set-sink-volume 0 +5%"
+
+# Playerctl bindings for controlling actual playing player
+bindsym $mod+Mod1+space exec "playerctl play-pause"
+bindsym $mod+Mod1+l exec "playerctl next"
+bindsym $mod+Mod1+h exec "playerctl previous"
+bindsym $mod+Mod1+k exec "playerctl position 10+"
+bindsym $mod+Mod1+j exec "playerctl position 10-"
+
+#
+# # # # # # # # # # # # # # #     Workspaces    # # # # # # # # # # # #
+#
+# Assume you are on workspace "1: www" and switch to "2: IM" using mod+2
+# because somebody sent you a message. You don’t need to remember
+# where you came from now, you can just press $mod+2 again to switch back to "1: www".
+workspace_auto_back_and_forth yes
+force_focus_wrapping yes
+# Default workspace layout
+workspace_layout tabbed
+
+# Switch to workspace
+bindsym $mod+1 workspace $wrkspc1
+bindsym $mod+2 workspace $wrkspc2
+bindsym $mod+3 workspace $wrkspc3
+bindsym $mod+4 workspace $wrkspc4
+bindsym $mod+5 workspace $wrkspc5
+bindsym $mod+6 workspace $wrkspc6
+bindsym $mod+7 workspace $wrkspc7
+bindsym $mod+8 workspace $wrkspc8
+bindsym $mod+9 workspace $wrkspc9
+bindsym $mod+0 workspace $wrkspc10
+
+bindsym $mod+q workspace prev
+bindsym $mod+w workspace next
+bindsym $mod+Shift+r exec i3-input -F 'rename workspace to "%s"' -P 'New name: '
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace $wrkspc1
+bindsym $mod+Shift+2 move container to workspace $wrkspc2
+bindsym $mod+Shift+3 move container to workspace $wrkspc3
+bindsym $mod+Shift+4 move container to workspace $wrkspc4
+bindsym $mod+Shift+5 move container to workspace $wrkspc5
+bindsym $mod+Shift+6 move container to workspace $wrkspc6
+bindsym $mod+Shift+7 move container to workspace $wrkspc7
+bindsym $mod+Shift+8 move container to workspace $wrkspc8
+bindsym $mod+Shift+9 move container to workspace $wrkspc9
+bindsym $mod+Shift+0 move container to workspace $wrkspc10
+
+# # # # # --- Assign windows to workspaces
+#
+# Window class and instance name can be checked with `xprop`
+# # web browsers go 1.
+assign [class="Opera|Chromium|google-chrome"] → $wrkspc1
+
+# # code editors - W2
+assign [class="subl|Subl|jetbrains|atom|intellij"] → $wrkspc2
+
+# # communication
+assign [class="franz|Franz"] → $wrkspc3
+
+# # Task management
+assign [class="Boostnote"] → $wrkspc5
+
+# # music apps to the 6th carriage
+assign [class="spotify|Spotify|cmus|mpsyt"] → $wrkspc6
+
+#
+# # # # # # # # # # # # # #     Windows/Clients     # # # # # # # # # # # # # #
+#
+# Focus the parent container
+bindsym $mod+o focus parent
+# Toggle focus mode parent/child
+bindsym $mod+Shift+o focus mode_toggle
+# Change focus
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+# move focused window
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+
+# Toggle fullscreen
+bindsym $mod+f fullscreen toggle
+# Kill focused window
+bindsym $mod+mod1+d kill
+
+# Change container layout
+bindsym $mod+p layout toggle all
+# Toggle floating/tiling
+bindsym $mod+Shift+p floating toggle
+# Remove all decorations from window (border + title)
+# bindsym $mod+0 border none
+# Sets title bar and 1 pixel borde for focused window
+# bindsym $mod+shift+0 border pixel 1
+# Small window for videos
+bindsym $mod+i fullscreen disable; floating enable; resize set 422 240; sticky enable; move position 870 25
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+
+# start a terminal
+bindsym $mod+Return exec "alacritty"
+bindsym $mod+Shift+Return exec "termite"
+
+# # # # # # Scratchpad is always available hidden container
+#
+# Add the currently focused window a scratchpad
+bindsym $mod+Shift+semicolon move scratchpad
+# Show the first scratchpad window
+bindsym $mod+semicolon scratchpad show
+
+# resize window (you can also use the mouse for that)
+mode "resize" {
+    bindsym h   resize shrink width  5 px or 5 ppt
+    bindsym j   resize shrink height 5 px or 5 ppt
+    bindsym k     resize grow height   5 px or 5 ppt
+    bindsym l  resize grow width    5 px or 5 ppt
+
+    # back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+
+##
+# move floating windows with keys
+set $mode_move 
+mode "$mode_move" {
+    bindsym $mod+Tab focus right
+
+    bindsym Left  move left
+    bindsym Down  move down
+    bindsym Up    move up
+    bindsym Right move right
+
+    bindsym h     move left
+    bindsym j     move down
+    bindsym k     move up
+    bindsym l     move right
+
+    # back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+m mode "$mode_move" focus floating
+# bindsym XF86AudioLowerVolume    exec $psst pactl set-sink-volume @DEFAULT_SINK@ -5% && pactl set-sink-mute @DEFAULT_SINK@ 0 $update
+# bindsym XF86AudioRaiseVolume    exec $psst pactl set-sink-volume @DEFAULT_SINK@ +5% && pactl set-sink-mute @DEFAULT_SINK@ 0 $update
+# bindsym XF86AudioMute           exec $psst pactl set-sink-mute @DEFAULT_SINK@ toggle $update
+
+client.focused #cccccc #cccccc #000000 #2d2d2d
+client.focused_inactive #393939 #393939 #888888 #292d2e
+client.unfocused #2d2d2d #2d2d2d #999999 #292d2e
+client.urgent #2f343a #900000 #ffffff #900000
