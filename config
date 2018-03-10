@@ -1,6 +1,7 @@
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 # setting mod variable to windows key
 set $mod Mod4
+set $alt Mod1
 
 set $silently --no-startup-id
 set $update && killall -SIGUSR1 i3status
@@ -34,66 +35,43 @@ popup_during_fullscreen leave_fullscreen
 
 # # # # # --- Feeling/Look/Style
 #
-# Window border size
+# Windows
 new_window none
 new_float none
-# Hides vertical and horizontal borders when there's only one window.
-for_window [class="^.*"] border pixel 7
-smart_borders on
-hide_edge_borders both
 # Font
 font pango:Ubuntu Mono 10
-# window (client) colors
-# class                 border  backgr. text    indicator
 
 # Prepend title with program name
 for_window [class=".*"] title_format "%class - %title"
-#
-# # # # # --- Status bar
-#             See also i3blocks.conf - configure each status bar widget
-#bar {
-#  i3bar_command i3bar -t
-#  id main-top-bar
-#  font pango:Ubuntu Mono 10
-#  status_command i3blocks -c ~/.config/i3/i3blocks.conf
-#  tray_output primary
-#  tray_padding 1
-#  strip_workspace_numbers yes
-#  binding_mode_indicator yes
-
-#  # Disable mouse on workspaces buttons
-#  # bindsym button1 nop
-#  position top
-#  colors {
-#    separator #515151
-#    background #2d2d2d66
-#    statusline #cccccc
-
-#    focused_workspace #cccccc #cccccc #000000
-#    active_workspace #333333 #333333 #ffffff
-#    inactive_workspace #2d2d2d #2d2d2d #999999
-#    urgent_workspace #f2777a #f2777a #ffffff
-#  }
-#}
 
 # Run on startup
 exec_always $silently ~/.config/i3/polybar.sh &
+#exec_always $silently stalonetray
 exec $silently nm-applet
 exec $silently pulseaudio --start
 exec $silently megasync
 exec $silently volumeicon
-exec $silently redshift
+exec $silently redshift-gtk
 # Restore GNOME's settings
 exec $silently /usr/libexec/gnome-settings-daemon-localeexec
 # Fix a bug in gnome-settings-daemon: http://feeding.cloud.geek.nz/posts/creating-a-modern-tiling-desktop-environment-using-i3/
 exec $silently dconf write /org/gnome/settings-daemon/plugins/cursor/active false
-# wallpaper or sth
+# Wallpaper
 exec $silently feh --bg-scale ~/.anypaper/output.png
-exec $silently google-chrome
+# For windows transparency
 exec $silently compton
 
+# # # Startup Applications
+# Web browser
+exec $silently google-chrome
 # System monitoring
-exec $silently i3-msg $wrkspc10 && exec alacritty --command glances
+exec i3-msg $wrkspc10 && exec alacritty --command glances
+# Franz (chat apps)
+exec $silently Franz
+# Email client
+exec $silently Mailspring
+# Code editor
+exec $silently subl
 
 # Specific window settings
 for_window [class="Nautilius|nautilius" instance="^desktop_window$"] floating disable
@@ -101,9 +79,13 @@ for_window [window_role="pop-up"] floating enable
 for_window [window_role="prefwindow"] floating enable
 for_window [class="notify"] floating enable
 
-# Gaps
+# i3 gaps specific
 gaps inner 10
-gaps outer 0
+gaps outer 5
+# Hides vertical and horizontal borders when there's only one window.
+for_window [class="^.*"] border pixel 5
+smart_borders on
+hide_edge_borders both
 
 # # # # # --- Launcher (rofi)
 #             see also rofi config
