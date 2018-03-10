@@ -8,8 +8,8 @@ set $update && killall -SIGUSR1 i3status
 set $wallps=~/Obrazy/wallpapers
 
 # set workspaces names
-Set $wrkspc1 "1:1"
-Set $wrkspc2 "2:2"
+set $wrkspc1 "1:1"
+set $wrkspc2 "2:2"
 set $wrkspc3 "3:3"
 set $wrkspc4 "4:4"
 set $wrkspc5 "5:5"
@@ -38,19 +38,29 @@ popup_during_fullscreen leave_fullscreen
 # Windows
 new_window none
 new_float none
+
 # Font
 font pango:Ubuntu Mono 10
 
 # Prepend title with program name
 for_window [class=".*"] title_format "%class - %title"
 
-# Run on startup
+# # # # # --- Startup applications/services
+# Great i3-bar replacement
 exec_always $silently ~/.config/i3/polybar.sh &
-#exec_always $silently stalonetray
+# TODO: Configure and use stalonetray or remove line below
+# exec_always $silently stalonetray
+
+# Network manager tray app
 exec $silently nm-applet
+# Start sound manager
+# TODO: Check if we need it
 exec $silently pulseaudio --start
+# MegaSync synchronizer
 exec $silently megasync
+# Volume tray icon
 exec $silently volumeicon
+# Screen color management
 exec $silently redshift-gtk
 # Restore GNOME's settings
 exec $silently /usr/libexec/gnome-settings-daemon-localeexec
@@ -61,15 +71,14 @@ exec $silently feh --bg-scale ~/.anypaper/output.png
 # For windows transparency
 exec $silently compton
 
-# # # Startup Applications
 # Web browser
 exec $silently google-chrome
 # System monitoring
-exec i3-msg $wrkspc10 && exec alacritty --command glances
+exec i3-msg workspace $wrkspc10 && exec alacritty --command glances
 # Franz (chat apps)
-exec $silently Franz
+exec $silently franz
 # Email client
-exec $silently Mailspring
+exec $silently mailspring
 # Code editor
 exec $silently subl
 
@@ -79,7 +88,7 @@ for_window [window_role="pop-up"] floating enable
 for_window [window_role="prefwindow"] floating enable
 for_window [class="notify"] floating enable
 
-# i3 gaps specific
+# # i3 gaps specific
 gaps inner 10
 gaps outer 5
 # Hides vertical and horizontal borders when there's only one window.
@@ -93,25 +102,25 @@ hide_edge_borders both
 bindsym $mod+d exec "rofi -show-icons -combi-modi drun,run,window, -show combi -modi combi"
 bindsym $mod+Shift+d exec "rofi -show-icons -modi window -show window"
 
-# Prefer to use mod+alt(Mod1) for WM wide actions
-bindsym $mod+Mod1+r restart
-bindsym $mod+Mod1+e exit
-bindsym $mod+Mod1+w exec "i3lock -i ~/.config/i3/i3-lock-screen.png -t -f"
-bindsym $mod+Mod1+q exec ~/scripts/rofi/power.sh
-bindsym $mod+Mod1+s exec ~/scripts/rofi/i3_switch_workspace.sh
+# Prefer to use mod+alt($alt) for WM wide actions
+bindsym $mod+$alt+r restart
+bindsym $mod+$alt+e exit
+bindsym $mod+$alt+w exec "i3lock -i ~/.config/i3/i3-lock-screen-2.png -t -f"
+bindsym $mod+$alt+q exec ~/scripts/rofi/power.sh
+bindsym $mod+$alt+s exec ~/scripts/rofi/i3_switch_workspace.sh
 
 # Volume/Playback
 # For PulseAudio 0 is sink to list sinks use
 # `pactl list sinks`
-bindsym $mod+Mod1+Down exec "pactl set-sink-volume 0 -5%"
-bindsym $mod+Mod1+Up exec "pactl set-sink-volume 0 +5%"
+bindsym $mod+$alt+semicolon exec "pactl set-sink-volume 0 -5%"
+bindsym $mod+$alt+apostrophe exec "pactl set-sink-volume 0 +5%"
 
 # Playerctl bindings for controlling actual playing player
-bindsym $mod+Mod1+space exec "playerctl play-pause"
-bindsym $mod+Mod1+l exec "playerctl next"
-bindsym $mod+Mod1+h exec "playerctl previous"
-bindsym $mod+Mod1+k exec "playerctl position 10+"
-bindsym $mod+Mod1+j exec "playerctl position 10-"
+bindsym $mod+$alt+space exec "playerctl play-pause"
+bindsym $mod+$alt+l exec "playerctl next"
+bindsym $mod+$alt+h exec "playerctl previous"
+bindsym $mod+$alt+k exec "playerctl position 10+"
+bindsym $mod+$alt+j exec "playerctl position 10-"
 
 #
 # # # # # # # # # # # # # # #     Workspaces    # # # # # # # # # # # #
@@ -138,7 +147,6 @@ bindsym $mod+0 workspace $wrkspc10
 
 bindsym $mod+q workspace prev
 bindsym $mod+w workspace next
-bindsym $mod+Shift+r exec i3-input -F 'rename workspace to "%s"' -P 'New name: '
 
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace $wrkspc1
@@ -156,16 +164,16 @@ bindsym $mod+Shift+0 move container to workspace $wrkspc10
 #
 # Window class and instance name can be checked with `xprop`
 # # web browsers go 1.
-assign [class="Opera|Chromium|google-chrome"] → $wrkspc1
+assign [class="Google-chrome|google-chrome|opera|Opera"] → $wrkspc1
 
 # # code editors - W2
 assign [class="subl|Subl|jetbrains|atom|intellij"] → $wrkspc2
 
-# # communication
-assign [class="franz|Franz"] → $wrkspc3
+# # communication - W3
+assign [class="franz|Franz|Mailspring|mailspring"] → $wrkspc3
 
-# # Task management
-assign [class="Boostnote"] → $wrkspc5
+# # Task management - W5
+assign [class="Boostnote|boostnote"] → $wrkspc5
 
 # # music apps to the 6th carriage
 assign [class="spotify|Spotify|cmus|mpsyt"] → $wrkspc6
@@ -192,16 +200,12 @@ bindsym $mod+Shift+l move right
 # Toggle fullscreen
 bindsym $mod+f fullscreen toggle
 # Kill focused window
-bindsym $mod+mod1+d kill
+bindsym $mod+$alt+d kill
 
 # Change container layout
 bindsym $mod+p layout toggle all
 # Toggle floating/tiling
 bindsym $mod+Shift+p floating toggle
-# Remove all decorations from window (border + title)
-# bindsym $mod+0 border none
-# Sets title bar and 1 pixel borde for focused window
-# bindsym $mod+shift+0 border pixel 1
 # Small window for videos
 bindsym $mod+i fullscreen disable; floating enable; resize set 422 240; sticky enable; move position 870 25
 
@@ -210,11 +214,12 @@ floating_modifier $mod
 
 # start a terminal
 bindsym $mod+Return exec "alacritty"
+bindsym $mod+$alt+Return exec "alacritty --command tmux"
 bindsym $mod+Shift+Return exec "termite"
 
 # # # # # # Scratchpad is always available hidden container
 #
-# Add the currently focused window a scratchpad
+# Add the currently focused window to scratchpad
 bindsym $mod+Shift+semicolon move scratchpad
 # Show the first scratchpad window
 bindsym $mod+semicolon scratchpad show
@@ -232,7 +237,6 @@ mode "resize" {
 }
 bindsym $mod+r mode "resize"
 
-##
 # move floating windows with keys
 set $mode_move 
 mode "$mode_move" {
