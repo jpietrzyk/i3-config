@@ -8,6 +8,8 @@ set $silently --no-startup-id
 set $update && killall -SIGUSR1 i3status
 set $wallps=~/Obrazy/wallpapers
 set $notify_volume=~/.config/i3/notify_volume.sh
+set $main_term=alacritty
+set $secondary_term=termite
 
 # set workspaces names
 set $wrkspc1 "1:1"
@@ -50,14 +52,12 @@ for_window [class=".*"] title_format "%class - %title"
 # # # # # --- Startup applications/services
 # Great i3-bar replacement
 exec_always $silently ~/.config/i3/polybar.sh &
-# TODO: Configure and use stalonetray or remove line below
-# exec_always $silently stalonetray
-
+exec $silently dunst -conf ~/.dunstrc &
 # Network manager tray app
 exec $silently nm-applet
 # Start sound manager
 # TODO: Check if we need it
-exec $silently pulseaudio --start
+#exec $silently pulseaudio --start
 # MegaSync synchronizer
 exec $silently megasync
 # Volume tray icon
@@ -86,6 +86,9 @@ exec $silently mailspring
 # Code editor
 exec $silently subl
 
+# # # Apps bindings
+#
+bindsym $mod+t exec $silently alacritty --command task list
 # Specific window settings
 for_window [class="Nautilius|nautilius" instance="^desktop_window$"] floating disable
 for_window [window_role="pop-up"] floating enable
@@ -103,15 +106,18 @@ hide_edge_borders both
 # # # # # --- Launcher (rofi)
 #             see also rofi config
 # Main launcher & window switcher
-bindsym $mod+d exec "rofi -show-icons -combi-modi drun,run,window, -show combi -modi combi"
-bindsym $mod+Shift+d exec "rofi -show-icons -modi window -show window"
+bindsym $mod+bracketleft exec "rofi -show-icons -combi-modi drun,run,window, -show combi -modi combi"
+bindsym $mod+bracketright exec "rofi -show-icons -modi window -show window"
+bindsym $mod+Shift+bracketleft exec "rofi -show-icons -modi window -show window"
+bindsym $mod+backslash exec ~/scripts/rofi/i3_switch_workspace.sh
+
 
 # Prefer to use mod+alt($alt) for WM wide actions
 bindsym $mod+$alt+r restart
 bindsym $mod+$alt+e exit
-bindsym $mod+$alt+w exec "i3lock -i ~/.config/i3/i3-lock-screen-2.png -t -f"
+bindsym $mod+$alt+w exec "i3lock -i ~/.config/i3/i3-lock-screen-1.png -t -f"
 bindsym $mod+$alt+q exec ~/scripts/rofi/power.sh
-bindsym $mod+$alt+s exec ~/scripts/rofi/i3_switch_workspace.sh
+
 
 # Volume/Playback
 # For PulseAudio 0 is sink to list sinks use
@@ -205,7 +211,7 @@ bindsym $mod+Shift+l move right
 # Toggle fullscreen
 bindsym $mod+f fullscreen toggle
 # Kill focused window
-bindsym $mod+$alt+d kill
+bindsym $mod+$alt+bracketleft kill
 
 # Change container layout
 bindsym $mod+p layout toggle all
