@@ -62,6 +62,8 @@ exec $silently pulseaudio --start
 exec $silently megasync
 # Volume tray icon
 exec $silently volumeicon
+# Volume tray icon
+exec $silently battery-monitor
 # Screen color management
 exec $silently redshift-gtk
 # Restore GNOME's settings
