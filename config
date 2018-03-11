@@ -3,9 +3,11 @@
 set $mod Mod4
 set $alt Mod1
 
+set $config_path=~/.config/i3
 set $silently --no-startup-id
 set $update && killall -SIGUSR1 i3status
 set $wallps=~/Obrazy/wallpapers
+set $notify_volume=~/.config/i3/notify_volume.sh
 
 # set workspaces names
 set $wrkspc1 "1:1"
@@ -112,8 +114,8 @@ bindsym $mod+$alt+s exec ~/scripts/rofi/i3_switch_workspace.sh
 # Volume/Playback
 # For PulseAudio 0 is sink to list sinks use
 # `pactl list sinks`
-bindsym $mod+$alt+semicolon exec "pactl set-sink-volume 0 -5%"
-bindsym $mod+$alt+apostrophe exec "pactl set-sink-volume 0 +5%"
+bindsym $mod+$alt+semicolon exec "pactl set-sink-volume 0 -5% && ~/.config/i3/notify_volume.sh"
+bindsym $mod+$alt+apostrophe exec pactl set-sink-volume 0 +5% && ~/.config/i3/notify_volume.sh
 
 # Playerctl bindings for controlling actual playing player
 bindsym $mod+$alt+space exec "playerctl play-pause"
@@ -121,6 +123,7 @@ bindsym $mod+$alt+l exec "playerctl next"
 bindsym $mod+$alt+h exec "playerctl previous"
 bindsym $mod+$alt+k exec "playerctl position 10+"
 bindsym $mod+$alt+j exec "playerctl position 10-"
+bindsym $mod+$alt+i exec ~/.config/i3/notify_played_track.sh
 
 #
 # # # # # # # # # # # # # # #     Workspaces    # # # # # # # # # # # #
