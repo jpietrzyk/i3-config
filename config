@@ -118,7 +118,7 @@ bindsym $mod+$alt+semicolon exec "pactl set-sink-volume 0 -5% && ~/.config/i3/no
 bindsym $mod+$alt+apostrophe exec pactl set-sink-volume 0 +5% && ~/.config/i3/notify_volume.sh
 
 # Playerctl bindings for controlling actual playing player
-bindsym $mod+$alt+space exec "playerctl play-pause"
+bindsym $mod+$alt+space exec "playerctl play-pause && ~/.config/i3/notify_played_track.sh"
 bindsym $mod+$alt+l exec "playerctl next"
 bindsym $mod+$alt+h exec "playerctl previous"
 bindsym $mod+$alt+k exec "playerctl position 10+"
