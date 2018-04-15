@@ -1,17 +1,24 @@
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
-# setting mod variable to windows key
+# set mod to win key
 set $mod Mod4
 set $alt Mod1
 
 set $config_path=~/.config/i3
 set $silently --no-startup-id
+# ?
 set $update && killall -SIGUSR1 i3status
-set $wallps=~/Obrazy/wallpapers
+# Wallpaper path
+set $wallpaper=~/.anypaper/output.png
+# path to script displaying volume value notifications
 set $notify_volume=~/.config/i3/notify_volume.sh
+# as main terminal app I'm using Alactitty: https://github.com/jwilm/alacritty
 set $main_term=alacritty
+# secondary terminal app is Termite https://github.com/thestinger/termite
 set $secondary_term=termite
 
-# set workspaces names
+# --- Look/Behavior ---
+
+# Workspaces names
 set $wrkspc1 "1:1"
 set $wrkspc2 "2:2"
 set $wrkspc3 "3:3"
@@ -24,21 +31,27 @@ set $wrkspc9 "9:9"
 set $wrkspc10 "10:10"
 
 #
-# # # # # # # # # # # #     WM    # # # # # # # # # # # #
+# Workspaces
 #
-# turn off mouse following
+# Assume you are on workspace "1: www" and switch to "2: IM" using mod+2
+# because somebody sent you a message. You don’t need to remember
+# where you came from now, you can just press $mod+2 again to switch back to "1: www".
+workspace_auto_back_and_forth yes
+force_focus_wrapping yes
+# Default workspace layout, can be `tabbed`, `...`
+workspace_layout tabbed
+
+# Turn off mouse following
 focus_follows_mouse no
 show_marks yes
 
-# If a window is activated, e.g., via google-chrome www.google.com,
-# it may request to take focus. The window will always be marked urgent,
+# If a window is activated, e.g., via `google-chrome www.google.com`,
+# it may request to take focus. The workspace will always be marked as urgent,
 # but the focus will not be stolen.
 focus_on_window_activation urgent
 force_display_urgency_hint 500 ms
 popup_during_fullscreen leave_fullscreen
 
-# # # # # --- Feeling/Look/Style
-#
 # Windows
 new_window none
 new_float none
@@ -46,56 +59,20 @@ new_float none
 # Font
 font pango:Ubuntu Mono 10
 
-# Prepend title with program name
+# Windows/Borders colors
+client.focused #cccccc #cccccc #000000 #2d2d2d
+client.focused_inactive #393939 #393939 #888888 #292d2e
+client.unfocused #2d2d2d #2d2d2d #999999 #292d2e
+client.urgent #2f343a #900000 #ffffff #900000
+
+# Prepend window title with app name
 for_window [class=".*"] title_format "%class - %title"
 
-# # # # # --- Startup applications/services
-# Great i3-bar replacement
-exec_always $silently ~/.config/i3/polybar.sh &
-exec $silently dunst -conf ~/.dunstrc &
-# Network manager tray app
-exec $silently nm-applet
-# Start sound manager
-# TODO: Check if we need it
-#exec $silently pulseaudio --start
-# MegaSync synchronizer
-exec $silently megasync
-# Volume tray icon
-exec $silently volumeicon
-# Volume tray icon
-exec $silently battery-monitor
-# Screen color management
-exec $silently redshift-gtk
-# Restore GNOME's settings
-exec $silently /usr/libexec/gnome-settings-daemon-localeexec
-# Fix a bug in gnome-settings-daemon: http://feeding.cloud.geek.nz/posts/creating-a-modern-tiling-desktop-environment-using-i3/
-exec $silently dconf write /org/gnome/settings-daemon/plugins/cursor/active false
-# Wallpaper
-exec $silently feh --bg-scale ~/.anypaper/output.png
-# For windows transparency
-exec $silently compton
-
-# Web browser
-exec $silently google-chrome
-# System monitoring
-exec i3-msg workspace $wrkspc10 && exec alacritty --command glances
-# Franz (chat apps)
-exec $silently franz
-# Email client
-exec $silently mailspring
-# Code editor
-exec $silently subl
-
-# # # Apps bindings
-#
-bindsym $mod+t exec $silently alacritty --command task list
-# Specific window settings
-for_window [class="Nautilius|nautilius" instance="^desktop_window$"] floating disable
+# Windows behavior
 for_window [window_role="pop-up"] floating enable
 for_window [window_role="prefwindow"] floating enable
-for_window [class="notify"] floating enable
 
-# # i3 gaps specific
+# Gaps - needs https://github.com/Airblader/i3
 gaps inner 10
 gaps outer 5
 # Hides vertical and horizontal borders when there's only one window.
@@ -103,29 +80,86 @@ for_window [class="^.*"] border pixel 5
 smart_borders on
 hide_edge_borders both
 
-# # # # # --- Launcher (rofi)
-#             see also rofi config
-# Main launcher & window switcher
+#
+# --- Startup applications/services ---
+#
+# As usual awesome i3-bar replacement: https://github.com/jaagr/polybar
+exec_always $silently ~/.config/i3/polybar.sh &
+# AAAAAAwesome notifications: https://dunst-project.org/
+exec $silently dunst -conf ~/.dunstrc &
+# Network manager tray app
+exec $silently nm-applet
+# Starts PulseAudio (if not working)
+exec $silently pulseaudio --start
+# Volume tray icon & mixer: http://xwmw.org/qastools/index.html
+exec $silently qasmixer --tray
+# MegaSync
+exec $silently megasync
+# Battery monitoring: https://github.com/maateen/battery-monitor
+exec $silently battery-monitor
+# Phone connection: https://community.kde.org/KDEConnect
+exec $silently indicator-kdeconnect
+# Screen color management
+exec $silently redshift-gtk
+# Restore GNOME's settings
+exec $silently /usr/libexec/gnome-settings-daemon-localeexec
+# Fix a bug in gnome-settings-daemon: http://feeding.cloud.geek.nz/posts/creating-a-modern-tiling-desktop-environment-using-i3/
+exec $silently dconf write /org/gnome/settings-daemon/plugins/cursor/active false
+# Wallpaper, requires `anypaper`: http://anypaper.sourceforge.net/
+# and `feh`: https://feh.finalrewind.org/
+exec $silently feh --bg-scale $wallpaper
+# For windows transparency
+exec $silently compton
+# Google Chrome web browser
+exec google-chrome
+# System monitoring and stats - on workspace 10
+exec i3-msg workspace $wrkspc10 && exec alacritty --command glances
+# Franz (chat apps)
+exec franz
+# Email client
+exec mailspring
+# Code editor
+exec subl
+
+# Assign windows to workspaces
+# (Window class and instance name can be checked with `xprop`)
+#
+# Web browsers to W1.
+assign [class="Google-chrome|google-chrome|opera|Opera"] → $wrkspc1
+# Code editors - W2
+assign [class="subl|Subl|jetbrains|atom|intellij"] → $wrkspc2
+# Communication - W3
+assign [class="franz|Franz|Mailspring|mailspring"] → $wrkspc3
+# Task management - W5
+assign [class="Boostnote|boostnote"] → $wrkspc5
+# Music players to the 6th carriage
+assign [class="spotify|Spotify|cmus|mpsyt"] → $wrkspc6
+
+#
+# --- Key bindings ---
+#
+# Launcher - the-world-beginign-with-an-A `rofi`: https://github.com/DaveDavenport/rofi
+# I still don't know if I like this combination :(
 bindsym $mod+bracketleft exec "rofi -show-icons -combi-modi drun,run,window, -show combi -modi combi"
 bindsym $mod+bracketright exec "rofi -show-icons -modi window -show window"
 bindsym $mod+Shift+bracketleft exec "rofi -show-icons -modi window -show window"
 bindsym $mod+backslash exec ~/scripts/rofi/i3_switch_workspace.sh
 
+# Terminal
+bindsym $mod+Return exec "alacritty"
+bindsym $mod+$alt+Return exec "alacritty --command tmux"
+bindsym $mod+Shift+Return exec "termite"
 
-# Prefer to use mod+alt($alt) for WM wide actions
+# System
 bindsym $mod+$alt+r restart
 bindsym $mod+$alt+e exit
-bindsym $mod+$alt+w exec "i3lock -i ~/.config/i3/i3-lock-screen-1.png -t -f"
+bindsym $mod+$alt+w exec "i3lock -i $wallpaper -t -f"
 bindsym $mod+$alt+q exec ~/scripts/rofi/power.sh
 
-
-# Volume/Playback
-# For PulseAudio 0 is sink to list sinks use
-# `pactl list sinks`
+# Sound/Music
 bindsym $mod+$alt+semicolon exec "pactl set-sink-volume 0 -5% && ~/.config/i3/notify_volume.sh"
 bindsym $mod+$alt+apostrophe exec pactl set-sink-volume 0 +5% && ~/.config/i3/notify_volume.sh
 
-# Playerctl bindings for controlling actual playing player
 bindsym $mod+$alt+space exec "playerctl play-pause && ~/.config/i3/notify_played_track.sh"
 bindsym $mod+$alt+l exec "playerctl next"
 bindsym $mod+$alt+h exec "playerctl previous"
@@ -133,18 +167,7 @@ bindsym $mod+$alt+k exec "playerctl position 10+"
 bindsym $mod+$alt+j exec "playerctl position 10-"
 bindsym $mod+$alt+i exec ~/.config/i3/notify_played_track.sh
 
-#
-# # # # # # # # # # # # # # #     Workspaces    # # # # # # # # # # # #
-#
-# Assume you are on workspace "1: www" and switch to "2: IM" using mod+2
-# because somebody sent you a message. You don’t need to remember
-# where you came from now, you can just press $mod+2 again to switch back to "1: www".
-workspace_auto_back_and_forth yes
-force_focus_wrapping yes
-# Default workspace layout
-workspace_layout tabbed
-
-# Switch to workspace
+# Workspace switch
 bindsym $mod+1 workspace $wrkspc1
 bindsym $mod+2 workspace $wrkspc2
 bindsym $mod+3 workspace $wrkspc3
@@ -159,7 +182,7 @@ bindsym $mod+0 workspace $wrkspc10
 bindsym $mod+q workspace prev
 bindsym $mod+w workspace next
 
-# move focused container to workspace
+# Move active to workspace
 bindsym $mod+Shift+1 move container to workspace $wrkspc1
 bindsym $mod+Shift+2 move container to workspace $wrkspc2
 bindsym $mod+Shift+3 move container to workspace $wrkspc3
@@ -171,27 +194,7 @@ bindsym $mod+Shift+8 move container to workspace $wrkspc8
 bindsym $mod+Shift+9 move container to workspace $wrkspc9
 bindsym $mod+Shift+0 move container to workspace $wrkspc10
 
-# # # # # --- Assign windows to workspaces
-#
-# Window class and instance name can be checked with `xprop`
-# # web browsers go 1.
-assign [class="Google-chrome|google-chrome|opera|Opera"] → $wrkspc1
-
-# # code editors - W2
-assign [class="subl|Subl|jetbrains|atom|intellij"] → $wrkspc2
-
-# # communication - W3
-assign [class="franz|Franz|Mailspring|mailspring"] → $wrkspc3
-
-# # Task management - W5
-assign [class="Boostnote|boostnote"] → $wrkspc5
-
-# # music apps to the 6th carriage
-assign [class="spotify|Spotify|cmus|mpsyt"] → $wrkspc6
-
-#
-# # # # # # # # # # # # # #     Windows/Clients     # # # # # # # # # # # # # #
-#
+# Windows/Clients
 # Focus the parent container
 bindsym $mod+o focus parent
 # Toggle focus mode parent/child
@@ -202,7 +205,7 @@ bindsym $mod+j focus down
 bindsym $mod+k focus up
 bindsym $mod+l focus right
 
-# move focused window
+# Move focused window
 bindsym $mod+Shift+h move left
 bindsym $mod+Shift+j move down
 bindsym $mod+Shift+k move up
@@ -217,18 +220,11 @@ bindsym $mod+$alt+bracketleft kill
 bindsym $mod+p layout toggle all
 # Toggle floating/tiling
 bindsym $mod+Shift+p floating toggle
-# Small window for videos
-bindsym $mod+i fullscreen disable; floating enable; resize set 422 240; sticky enable; move position 870 25
 
-# Use Mouse+$mod to drag floating windows to their wanted position
+# Mouse+$mod to drag floating windows
 floating_modifier $mod
 
-# start a terminal
-bindsym $mod+Return exec "alacritty"
-bindsym $mod+$alt+Return exec "alacritty --command tmux"
-bindsym $mod+Shift+Return exec "termite"
-
-# # # # # # Scratchpad is always available hidden container
+# `Scratchpad` - always available hidden container
 #
 # Add the currently focused window to scratchpad
 bindsym $mod+Shift+semicolon move scratchpad
@@ -268,11 +264,3 @@ mode "$mode_move" {
     bindsym Escape mode "default"
 }
 bindsym $mod+m mode "$mode_move" focus floating
-# bindsym XF86AudioLowerVolume    exec $psst pactl set-sink-volume @DEFAULT_SINK@ -5% && pactl set-sink-mute @DEFAULT_SINK@ 0 $update
-# bindsym XF86AudioRaiseVolume    exec $psst pactl set-sink-volume @DEFAULT_SINK@ +5% && pactl set-sink-mute @DEFAULT_SINK@ 0 $update
-# bindsym XF86AudioMute           exec $psst pactl set-sink-mute @DEFAULT_SINK@ toggle $update
-
-client.focused #cccccc #cccccc #000000 #2d2d2d
-client.focused_inactive #393939 #393939 #888888 #292d2e
-client.unfocused #2d2d2d #2d2d2d #999999 #292d2e
-client.urgent #2f343a #900000 #ffffff #900000

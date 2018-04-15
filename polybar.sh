@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
+# Restarts `Polybar` in place
+# TODO: check it: https://github.com/jaagr/polybar/issues/563
 
 # Terminate already running bar instances
 killall -q polybar
